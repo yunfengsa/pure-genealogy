@@ -12,6 +12,7 @@ import {
   useReactFlow,
   ReactFlowProvider,
   type Node,
+  type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ interface TimelineClientProps {
 const nodeTypes = {
   timelineMember: TimelineNode,
   yearMarker: YearNode,
-};
+} as unknown as NodeTypes;
 
 // Configuration
 const PIXELS_PER_YEAR = 60;
@@ -44,7 +45,7 @@ const TRACK_GAP = 2; // years gap between members on same track
 const HEADER_HEIGHT = 40;
 
 function TimelineFlow({ initialData }: TimelineClientProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const reactFlowInstance = useReactFlow();

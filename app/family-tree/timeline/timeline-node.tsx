@@ -1,4 +1,4 @@
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { memo } from "react";
 import { cn } from "@/lib/utils";
 
@@ -10,8 +10,8 @@ export interface TimelineNodeData extends Record<string, unknown> {
   width: number;
 }
 
-export const TimelineNode = memo(({ data, selected }: NodeProps<any>) => {
-  const { name, startYear, endYear, isAlive, width } = data as TimelineNodeData;
+export const TimelineNode = memo(({ data, selected }: NodeProps<Node<TimelineNodeData>>) => {
+  const { name, startYear, endYear, isAlive, width } = data;
   const lifespan = isAlive ? "在世" : `${startYear} - ${endYear}`;
 
   return (
