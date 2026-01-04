@@ -1,4 +1,7 @@
 {
+  "name": "pure-genealogy",
+  "version": "0.1.0",
+  "description": "A genealogy web application built with Next.js, Supabase, and Tailwind CSS.",
   "private": true,
   "scripts": {
     "dev": "next dev",

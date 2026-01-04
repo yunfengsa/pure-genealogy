@@ -1,4 +1,4 @@
-# Liu Family 族谱项目 - AI 编码指南
+# pure-genealogy 族谱项目 - AI 编码指南
 
 ## 项目概述
 

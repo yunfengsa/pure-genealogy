@@ -1,109 +1,128 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# 族谱管理系统
 
 <p align="center">
- The fastest way to build apps with Next.js and Supabase
+  <img alt="pure-genealogy Tree" src="app/opengraph-image.png" width="800">
 </p>
 
 <p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
+  一个基于 Next.js 15 和 Supabase 构建的现代化家族族谱管理系统。
 </p>
-<br/>
 
-## Features
+## ✨ 项目亮点
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- **现代化技术栈**: 采用最新的 Next.js 15 (App Router) 和 React 19。
+- **全栈解决方案**: 后端使用 Supabase，提供数据库、认证和实时功能。
+- **优雅的 UI 设计**: 基于 shadcn/ui 和 Tailwind CSS，支持明暗模式切换。
+- **可视化族谱**: 使用 React Flow (@xyflow/react) 自动生成动态交互的家族树形图。
+- **完备的功能**: 支持家族成员的增删改查、搜索、分页等功能。
 
-## Demo
+## 🛠️ 技术栈
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+- **框架**: [Next.js 15](https://nextjs.org/) (App Router, Server Actions)
+- **数据库 & 认证**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **UI 组件库**: [shadcn/ui](https://ui.shadcn.com/)
+- **样式**: [Tailwind CSS](https://tailwindcss.com/)
+- **可视化**: [@xyflow/react](https://reactflow.dev/) (React Flow)
+- **图标**: [Lucide React](https://lucide.dev/)
 
-## Deploy to Vercel
+## 🚀 主要功能
 
-Vercel deployment will guide you through creating a Supabase account and project.
+### 1. 族谱成员管理 (`/family-tree`)
+- **列表展示**: 分页显示家族成员列表。
+- **搜索**: 支持按姓名实时搜索成员。
+- **编辑/添加**: 完整的表单支持，包括基本信息、父母关联、配偶等。
+- **删除**: 支持批量操作。
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### 2. 族谱可视化 (`/family-tree/graph`)
+- **自动布局**: 根据 `father_id` 关系自动生成树形结构。
+- **交互**: 支持缩放、拖拽和平移查看。
+- **节点详情**: 展示成员姓名、代数、配偶等关键信息。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### 3. 用户系统
+- **安全认证**: 完整的注册、登录、找回密码流程。
+- **权限控制**: 核心功能需登录后访问。
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+## 📦 快速开始
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### 1. 克隆项目
 
-## Clone and run locally
+```bash
+git clone
+cd pure-genealogy
+```
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 2. 安装依赖
 
-2. Create a Next.js app using the Supabase Starter template npx command
+```bash
+npm install
+```
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+### 3. 配置环境变量
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+复制 `.env.example` (如果没有则新建) 为 `.env.local` 并填入 Supabase 项目配置：
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+```env
+NEXT_PUBLIC_SUPABASE_URL=你的_Supabase_项目_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=你的_Supabase_Anon_Key
+```
 
-3. Use `cd` to change into the app's directory
+### 4. 初始化数据库
 
-   ```bash
-   cd with-supabase-app
-   ```
+在 Supabase 项目的 SQL Editor 中执行以下 SQL 脚本，创建必要的表结构：
 
-4. Rename `.env.example` to `.env.local` and update the following:
+```sql
+-- 位于 .github/family_members.sql
+-- 创建家族成员表
+CREATE TABLE family_members (
+    id BIGINT PRIMARY KEY GENERATED BY DEFAULT AS IDENTITY,
+    name TEXT NOT NULL,
+    generation INTEGER,
+    sibling_order INTEGER,
+    father_id BIGINT REFERENCES family_members(id),
+    gender TEXT CHECK (gender IN ('男', '女')),
+    official_position TEXT,
+    is_alive BOOLEAN DEFAULT TRUE,
+    spouse TEXT,
+    remarks TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
 
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+-- 创建索引
+CREATE INDEX idx_family_members_father_id ON family_members(father_id);
+CREATE INDEX idx_family_members_name ON family_members(name);
+```
 
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+### 5. 启动开发服务器
 
-5. You can now run the Next.js local development server:
+```bash
+npm run dev
+```
 
-   ```bash
-   npm run dev
-   ```
+访问 [http://localhost:3000](http://localhost:3000) 即可看到应用。
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+## 📂 项目结构
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+```
+/
+├── app/                  # Next.js App Router 目录
+│   ├── auth/             # 认证相关页面
+│   ├── family-tree/      # 族谱管理功能
+│   │   ├── graph/        # 族谱可视化图表
+│   │   └── page.tsx      # 成员列表页
+│   └── protected/        # 受保护的示例页面
+├── components/           # React 组件
+│   ├── ui/               # shadcn/ui 通用组件
+│   └── ...               # 业务组件
+├── lib/                  # 工具库
+│   └── supabase/         # Supabase 客户端配置
+├── hooks/                # 自定义 Hooks
+└── public/               # 静态资源
+```
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+## 🤝 贡献
 
-## Feedback and issues
+欢迎提交 Issue 或 Pull Request 来改进这个项目！
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+## 📄 许可证
 
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+[MIT](LICENSE)
