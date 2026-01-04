@@ -86,7 +86,7 @@ export const RealtimeChat = ({
       <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {allMessages.length === 0 ? (
           <div className="text-center text-sm text-muted-foreground">
-            No messages yet. Start the conversation!
+            暂无消息。开始对话吧！
           </div>
         ) : null}
         <div className="space-y-1">
@@ -119,7 +119,7 @@ export const RealtimeChat = ({
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="输入消息..."
           disabled={!isConnected}
         />
         {isConnected && newMessage.trim() && (
