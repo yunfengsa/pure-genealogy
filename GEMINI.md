@@ -3,6 +3,7 @@
 ## 项目概述
 
 这是一个基于 **Next.js 15 (App Router)** + **Supabase** 的家族族谱管理应用，使用 TypeScript 开发。
+项目已进行**全面中文化**（zh-CN），包括 UI 文案、日期格式及元数据。
 
 ## 技术栈
 
@@ -50,26 +51,32 @@ const supabase = createClient();
 
 ### 族谱管理 (`app/family-tree/`)
 - **成员列表**: 分页展示家族成员，支持搜索。
-- **添加/编辑**: 包含成员基本信息、父母关系（`father_id`）、配偶等。
+- **添加/编辑**: 包含成员基本信息、父母关系（`father_id`）、配偶、生日（`birthday`）、居住地（`residence_place`）等。
+- **通用组件**: `MemberDetailDialog` 用于在 2D/3D 视图中统一展示成员详情。
 
 ### 族谱可视化 (`app/family-tree/graph/`)
 - 基于 `@xyflow/react` 实现。
 - 自动生成树形结构图，展示成员关系。
+- 详情弹窗复用 `MemberDetailDialog`。
 
 ### 3D 族谱可视化 (`app/family-tree/graph-3d/`)
 - 基于 `react-force-graph-3d` 实现。
 - 提供三维视角的力导向图，支持全屏、搜索定位、节点点击详情等功能。
 - 使用 `three-spritetext` 渲染清晰的文字标签。
+- 详情弹窗复用 `MemberDetailDialog`。
 
 ## 数据库 Schema
 
 ### family_members 表（族谱核心表）
 ```sql
 id, name, generation, sibling_order, father_id, gender, 
-official_position, is_alive, spouse, remarks, updated_at, birthday, residence_place
+official_position, is_alive, spouse, remarks, updated_at,
+birthday, residence_place
 ```
 - `father_id` 自引用实现树形结构
 - `gender` 限制为 '男' 或 '女'
+- `birthday` 类型为 `date`
+- `residence_place` 类型为 `text`
 
 ## 开发命令
 
