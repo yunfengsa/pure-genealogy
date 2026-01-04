@@ -222,6 +222,7 @@ export async function updateFamilyMember(
       spouse: input.spouse,
       remarks: input.remarks,
       birthday: input.birthday,
+      death_date: input.death_date,
       residence_place: input.residence_place,
       updated_at: new Date().toISOString(),
     })
@@ -311,4 +312,22 @@ export async function batchCreateFamilyMembers(
 
   revalidatePath("/family-tree");
   return { success: true, count: members.length, error: null };
+}
+
+export async function fetchMembersForTimeline(): Promise<
+  { id: number; name: string; birthday: string | null; death_date: string | null; generation: number | null }[]
+> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("family_members")
+    .select("id, name, birthday, death_date, generation")
+    .order("birthday", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching timeline data:", error);
+    return [];
+  }
+
+  return data || [];
 }

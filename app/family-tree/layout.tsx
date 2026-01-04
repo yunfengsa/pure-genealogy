@@ -16,6 +16,22 @@ export default function FamilyTreeLayout({
           <Link href="/" className="font-semibold text-lg hover:opacity-80 transition-opacity">
             刘氏族谱
           </Link>
+          
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <Link href="/family-tree" className="hover:text-primary transition-colors">
+              成员列表
+            </Link>
+            <Link href="/family-tree/graph" className="hover:text-primary transition-colors">
+              2D 族谱
+            </Link>
+            <Link href="/family-tree/graph-3d" className="hover:text-primary transition-colors">
+              3D 族谱
+            </Link>
+             <Link href="/family-tree/timeline" className="hover:text-primary transition-colors">
+              时间轴
+            </Link>
+          </nav>
+
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
             <Suspense fallback={<div className="h-9 w-32 bg-muted animate-pulse rounded-md" />}>
