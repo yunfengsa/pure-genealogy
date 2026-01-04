@@ -15,7 +15,7 @@ import {
   BackgroundVariant,
   type NodeTypes,
 } from "@xyflow/react";
-// @ts-ignore
+// @ts-expect-error - CSS module import
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { FamilyMemberNodeType, type FamilyNodeData } from "./family-node";
 import type { FamilyMemberNode } from "./actions";
+import dagre from "@dagrejs/dagre";
 
 const nodeTypes: NodeTypes = {
   familyMember: FamilyMemberNodeType,
@@ -49,11 +50,11 @@ interface FamilyTreeGraphProps {
 // 布局常量
 const NODE_WIDTH = 160;
 const NODE_HEIGHT = 100;
-const HORIZONTAL_GAP = 60;
+const HORIZONTAL_GAP = 80;
 const VERTICAL_GAP = 120;
 
-// 将族谱数据转换为 React Flow 的节点和边
-function transformDataToFlow(
+// 使用 dagre 进行自动布局，避免连线交叉
+function getLayoutedElements(
   members: FamilyMemberNode[],
   highlightedId: number | null
 ): { nodes: Node[]; edges: Edge[] } {
@@ -61,53 +62,32 @@ function transformDataToFlow(
     return { nodes: [], edges: [] };
   }
 
-  const nodes: Node[] = [];
-  const edges: Edge[] = [];
-
-  // 按世代分组
-  const generationMap = new Map<number, FamilyMemberNode[]>();
-  members.forEach((member) => {
-    const gen = member.generation ?? 0;
-    if (!generationMap.has(gen)) {
-      generationMap.set(gen, []);
-    }
-    const genMembers = generationMap.get(gen);
-    if (genMembers) {
-      genMembers.push(member);
-    }
+  // 创建 dagre 图
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  dagreGraph.setGraph({
+    rankdir: "TB", // 从上到下布局
+    nodesep: HORIZONTAL_GAP, // 同层节点间距
+    ranksep: VERTICAL_GAP, // 层间距
+    align: "UL", // 对齐方式
   });
 
-  // 按世代排序
-  const sortedGenerations = Array.from(generationMap.keys()).sort((a, b) => a - b);
+  // 添加所有节点到 dagre 图
+  members.forEach((member) => {
+    dagreGraph.setNode(String(member.id), {
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
+    });
+  });
 
-  // 计算每个节点的位置
-  sortedGenerations.forEach((gen, genIndex) => {
-    const membersInGen = generationMap.get(gen);
-    if (!membersInGen) return;
-    // 按排行排序
-    membersInGen.sort((a, b) => (a.sibling_order ?? 0) - (b.sibling_order ?? 0));
-
-    const totalWidth = membersInGen.length * NODE_WIDTH + (membersInGen.length - 1) * HORIZONTAL_GAP;
-    const startX = -totalWidth / 2;
-
-    membersInGen.forEach((member, index) => {
-      const nodeData: FamilyNodeData = {
-        ...member,
-        isHighlighted: member.id === highlightedId,
-      };
-
-      nodes.push({
-        id: String(member.id),
-        type: "familyMember",
-        position: {
-          x: startX + index * (NODE_WIDTH + HORIZONTAL_GAP),
-          y: genIndex * (NODE_HEIGHT + VERTICAL_GAP),
-        },
-        data: nodeData,
-      });
-
-      // 创建与父亲的连接边
-      if (member.father_id) {
+  // 添加所有边到 dagre 图
+  const edges: Edge[] = [];
+  members.forEach((member) => {
+    if (member.father_id) {
+      // 确保父节点存在
+      const fatherExists = members.some((m) => m.id === member.father_id);
+      if (fatherExists) {
+        dagreGraph.setEdge(String(member.father_id), String(member.id));
         edges.push({
           id: `e${member.father_id}-${member.id}`,
           source: String(member.father_id),
@@ -117,7 +97,30 @@ function transformDataToFlow(
           style: { stroke: "hsl(var(--muted-foreground))", strokeWidth: 2 },
         });
       }
-    });
+    }
+  });
+
+  // 计算布局
+  dagre.layout(dagreGraph);
+
+  // 转换为 React Flow 节点
+  const nodes: Node[] = members.map((member) => {
+    const nodeWithPosition = dagreGraph.node(String(member.id));
+    const nodeData: FamilyNodeData = {
+      ...member,
+      isHighlighted: member.id === highlightedId,
+    };
+
+    return {
+      id: String(member.id),
+      type: "familyMember",
+      // dagre 返回的是节点中心点，需要调整为左上角
+      position: {
+        x: nodeWithPosition.x - NODE_WIDTH / 2,
+        y: nodeWithPosition.y - NODE_HEIGHT / 2,
+      },
+      data: nodeData,
+    };
   });
 
   return { nodes, edges };
@@ -133,9 +136,9 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
   const [selectedMember, setSelectedMember] = useState<FamilyMemberNode | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-  // 转换数据为节点和边
+  // 转换数据为节点和边（使用 dagre 自动布局）
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () => transformDataToFlow(initialData, highlightedId),
+    () => getLayoutedElements(initialData, highlightedId),
     [initialData, highlightedId]
   );
 
