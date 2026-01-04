@@ -16,6 +16,7 @@ export interface FamilyMember {
   spouse: string | null;
   remarks: string | null;
   birthday: string | null;
+  death_date: string | null;
   residence_place: string | null;
   updated_at: string;
 }
@@ -91,6 +92,7 @@ export interface CreateMemberInput {
   spouse?: string | null;
   remarks?: string | null;
   birthday?: string | null;
+  death_date?: string | null;
   residence_place?: string | null;
 }
 
@@ -110,6 +112,7 @@ export async function createFamilyMember(
     spouse: input.spouse,
     remarks: input.remarks,
     birthday: input.birthday,
+    death_date: input.death_date,
     residence_place: input.residence_place,
   });
 
@@ -219,6 +222,7 @@ export async function updateFamilyMember(
       spouse: input.spouse,
       remarks: input.remarks,
       birthday: input.birthday,
+      death_date: input.death_date,
       residence_place: input.residence_place,
       updated_at: new Date().toISOString(),
     })

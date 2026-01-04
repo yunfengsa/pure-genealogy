@@ -88,6 +88,11 @@ export function MemberDetailDialog({
           </div>
 
           <div className="space-y-1">
+            <span className="text-muted-foreground">卒年</span>
+            <p className="font-medium">{formatDate(member.death_date)}</p>
+          </div>
+
+          <div className="space-y-1">
             <span className="text-muted-foreground">居住地</span>
             <p className="font-medium">{member.residence_place || "-"}</p>
           </div>

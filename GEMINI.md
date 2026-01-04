@@ -70,8 +70,7 @@ const supabase = createClient();
 ### family_members 表（族谱核心表）
 ```sql
 id, name, generation, sibling_order, father_id, gender, 
-official_position, is_alive, spouse, remarks, updated_at,
-birthday, residence_place
+official_position, is_alive, spouse, remarks, birthday, death_date, residence_place, updated_at
 ```
 - `father_id` 自引用实现树形结构
 - `gender` 限制为 '男' 或 '女'

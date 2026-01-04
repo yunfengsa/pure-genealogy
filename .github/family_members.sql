@@ -12,6 +12,7 @@ id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   remarks text,
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   birthday date,
+  death_date date,
   residence_place text,
   CONSTRAINT family_members_pkey PRIMARY KEY (id),
   CONSTRAINT family_members_father_id_fkey FOREIGN KEY (father_id) REFERENCES public.family_members(id)
@@ -31,6 +32,7 @@ COMMENT ON COLUMN family_members.spouse IS '配偶姓名';
 COMMENT ON COLUMN family_members.remarks IS '备注';
 COMMENT ON COLUMN family_members.updated_at IS '最后更新时间';
 COMMENT ON COLUMN family_members.birthday IS '出生日期';
+COMMENT ON COLUMN family_members.death_date IS '去世日期';
 COMMENT ON COLUMN family_members.residence_place IS '居住地';
 
 -- 创建索引以优化查询速度

@@ -79,6 +79,7 @@ export function FamilyMembersTable({
     spouse: "",
     remarks: "",
     birthday: "",
+    death_date: "",
     residence_place: "",
   });
 
@@ -165,6 +166,7 @@ export function FamilyMembersTable({
       spouse: "",
       remarks: "",
       birthday: "",
+      death_date: "",
       residence_place: "",
     });
     setEditingMember(null);
@@ -190,6 +192,7 @@ export function FamilyMembersTable({
       spouse: member.spouse ?? "",
       remarks: member.remarks ?? "",
       birthday: member.birthday ?? "",
+      death_date: member.death_date ?? "",
       residence_place: member.residence_place ?? "",
     });
     setIsDialogOpen(true);
@@ -224,6 +227,7 @@ export function FamilyMembersTable({
       spouse: formData.spouse || null,
       remarks: formData.remarks || null,
       birthday: formData.birthday || null,
+      death_date: (!formData.is_alive && formData.death_date) ? formData.death_date : null,
       residence_place: formData.residence_place || null,
     };
 
@@ -462,6 +466,24 @@ export function FamilyMembersTable({
                 </div>
               </div>
 
+              {/* 卒年 (仅去世可选) */}
+              {!formData.is_alive && (
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="death_date" className="text-right">
+                    卒年
+                  </Label>
+                  <Input
+                    id="death_date"
+                    type="date"
+                    value={formData.death_date}
+                    onChange={(e) =>
+                      setFormData({ ...formData, death_date: e.target.value })
+                    }
+                    className="col-span-3"
+                  />
+                </div>
+              )}
+
               {/* 配偶 */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="spouse" className="text-right">
@@ -527,6 +549,7 @@ export function FamilyMembersTable({
               <TableHead className="w-24">父亲</TableHead>
               <TableHead className="w-16">性别</TableHead>
               <TableHead>生日</TableHead>
+              <TableHead>卒年</TableHead>
               <TableHead>居住地</TableHead>
               <TableHead>官职</TableHead>
               <TableHead className="w-20">在世</TableHead>
@@ -592,6 +615,14 @@ export function FamilyMembersTable({
                     {member.birthday
                       ? (() => {
                           const [y, m, d] = member.birthday.split("-");
+                          return `${y}年${m}月${d}日`;
+                        })()
+                      : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {member.death_date
+                      ? (() => {
+                          const [y, m, d] = member.death_date.split("-");
                           return `${y}年${m}月${d}日`;
                         })()
                       : "-"}

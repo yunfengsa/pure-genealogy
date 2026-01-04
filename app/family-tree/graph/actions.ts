@@ -14,6 +14,7 @@ export interface FamilyMemberNode {
   spouse: string | null;
   remarks: string | null;
   birthday: string | null;
+  death_date: string | null;
   residence_place: string | null;
 }
 
@@ -27,7 +28,7 @@ export async function fetchAllFamilyMembers(): Promise<FetchGraphResult> {
 
   const { data, error } = await supabase
     .from("family_members")
-    .select("id, name, generation, sibling_order, father_id, gender, official_position, is_alive, spouse, remarks, birthday, residence_place")
+    .select("id, name, generation, sibling_order, father_id, gender, official_position, is_alive, spouse, remarks, birthday, death_date, residence_place")
     .order("generation", { ascending: true })
     .order("sibling_order", { ascending: true });
 
