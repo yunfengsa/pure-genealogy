@@ -52,13 +52,20 @@ export function FamilyForceGraph({ data }: ForceGraphProps) {
   const fgRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [instanceKey, setInstanceKey] = useState<string>("");
+
+  useEffect(() => {
+    setMounted(true);
+    setInstanceKey(Math.random().toString(36).substring(7));
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<FamilyMemberNode | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // 监听容器大小变化
   useEffect(() => {
@@ -72,8 +79,16 @@ export function FamilyForceGraph({ data }: ForceGraphProps) {
     };
 
     updateDimensions();
+    // 添加 resize 监听之前先执行一次，确保初始有值
+    
     window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
+    // 稍微延迟一下再次检查，防止初始渲染时容器未撑开
+    const timer = setTimeout(updateDimensions, 100);
+
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+      clearTimeout(timer);
+    };
   }, []);
 
   // 转换数据为 graph 格式
@@ -167,9 +182,11 @@ export function FamilyForceGraph({ data }: ForceGraphProps) {
 
   // 主题颜色配置
   const isDark = theme === "dark";
-  const bgColor = isDark ? "#020817" : "#ffffff"; // background / foreground
+  const bgColor = isDark ? "#1c1917" : "#ffffff"; // background based on Stone theme
   const nodeTextColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)";
   const linkColor = isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)";
+
+  if (!mounted) return null;
 
   return (
     <div 
@@ -209,8 +226,10 @@ export function FamilyForceGraph({ data }: ForceGraphProps) {
       </div>
 
       {/* 3D 图表 */}
-      <ForceGraph3D
-        ref={fgRef}
+      {dimensions.width > 0 && instanceKey && (
+        <ForceGraph3D
+          key={instanceKey}
+          ref={fgRef}
         width={dimensions.width}
         height={dimensions.height}
         graphData={graphData}
@@ -251,6 +270,7 @@ export function FamilyForceGraph({ data }: ForceGraphProps) {
           );
         }}
       />
+      )}
 
       <MemberDetailDialog
         isOpen={isDetailOpen}
