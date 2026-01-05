@@ -194,7 +194,10 @@ function TimelineFlow({ initialData }: TimelineClientProps) {
         nodesConnectable={false}
       >
         <Background variant={BackgroundVariant.Lines} gap={PIXELS_PER_YEAR * 10} size={1} className="opacity-20" />
-        <Controls />
+        <Controls 
+          showInteractive={false} 
+          className="!bg-background !border !border-border !shadow-md [&>button]:!bg-background [&>button]:!border-border [&>button]:!text-foreground [&>button:hover]:!bg-muted [&>button>svg]:!fill-current"
+        />
         <Panel position="top-left" className="flex gap-2">
           <div className="flex gap-2 bg-background/90 p-2 rounded-md border shadow-sm">
             <Input
