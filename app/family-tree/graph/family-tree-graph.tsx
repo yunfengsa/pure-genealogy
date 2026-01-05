@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import { FamilyMemberNodeType, type FamilyNodeData } from "./family-node";
+import { FlowingEdge } from "./flowing-edge";
 import type { FamilyMemberNode } from "./actions";
 import dagre from "@dagrejs/dagre";
 
@@ -40,6 +41,10 @@ import { MemberDetailDialog } from "../member-detail-dialog";
 
 const nodeTypes: NodeTypes = {
   familyMember: FamilyMemberNodeType,
+};
+
+const edgeTypes = {
+  flowing: FlowingEdge,
 };
 
 interface FamilyTreeGraphProps {
@@ -126,7 +131,7 @@ function getLayoutedElements(
           id: `e${member.father_id}-${member.id}`,
           source: String(member.father_id),
           target: String(member.id),
-          type: "smoothstep",
+          type: "flowing",
           animated: false,
           style: { stroke: "hsl(var(--muted-foreground))", strokeWidth: 2 },
         });
@@ -436,6 +441,7 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.1}
