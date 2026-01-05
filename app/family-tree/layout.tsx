@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { MobileNav } from "@/components/mobile-nav";
 
 export default function FamilyTreeLayout({
   children,
@@ -34,9 +35,16 @@ export default function FamilyTreeLayout({
 
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
-            <Suspense fallback={<div className="h-9 w-32 bg-muted animate-pulse rounded-md" />}>
-              <AuthButton />
-            </Suspense>
+            <div className="hidden md:block">
+              <Suspense fallback={<div className="h-9 w-32 bg-muted animate-pulse rounded-md" />}>
+                <AuthButton />
+              </Suspense>
+            </div>
+            <MobileNav>
+              <Suspense fallback={<div className="h-9 w-full bg-muted animate-pulse rounded-md" />}>
+                <AuthButton />
+              </Suspense>
+            </MobileNav>
           </div>
         </div>
       </header>
