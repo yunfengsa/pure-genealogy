@@ -380,9 +380,9 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
     // 计算所有节点的边界
     const bounds = getNodesBounds(nodes);
 
-    // 设置导出图片的尺寸（包含一些内边距）
-    const imageWidth = bounds.width + 200;
-    const imageHeight = bounds.height + 200;
+    // 设置导出图片的尺寸（包含更多内边距，让画面更舒展）
+    const imageWidth = bounds.width + 300;
+    const imageHeight = bounds.height + 300;
 
     // 计算变换参数以适应所有节点
     const transform = getViewportForBounds(
@@ -391,22 +391,27 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
       imageHeight,
       0.1, // min zoom
       2, // max zoom
-      0.1 // padding
+      0.15 // padding (增加留白)
     );
 
     toPng(viewportElem, {
-      backgroundColor: "#ffffff",
+      // 兜底背景色 (Mint 50)
+      backgroundColor: "#f0fdf4",
       width: imageWidth,
       height: imageHeight,
       style: {
         width: imageWidth.toString(),
         height: imageHeight.toString(),
         transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`,
+        backgroundSize: "20px 20px, 100% 100%", // 点阵重复，渐变铺满
+        // 确保字体渲染清晰且一致
+        fontFamily: 'system-ui, -apple-system, sans-serif',
       },
-      pixelRatio: 2, // 2倍像素比，保证高清
+      pixelRatio: 2.5, // 稍微提高像素比，保证更高清
+      cacheBust: true, // 避免缓存导致图片加载失败
     }).then((dataUrl) => {
       const a = document.createElement("a");
-      a.setAttribute("download", "family-tree.png");
+      a.setAttribute("download", `family-tree-${new Date().toISOString().split('T')[0]}.png`);
       a.setAttribute("href", dataUrl);
       a.click();
     });
