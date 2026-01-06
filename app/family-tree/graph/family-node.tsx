@@ -32,19 +32,21 @@ function FamilyMemberNodeComponent({ data }: FamilyNodeProps) {
   return (
     <div
       className={cn(
-        "px-4 py-3 rounded-lg border-2 bg-card text-card-foreground shadow-md min-w-[140px] transition-all duration-200 relative group",
+        "px-4 py-3 rounded-lg border-2 text-card-foreground shadow-md min-w-[140px] transition-all duration-200 relative group",
+        // 背景色
+        nodeData.is_alive ? "bg-card" : "bg-muted/50",
         // 基础边框颜色
         nodeData.gender === "男" 
-          ? "border-blue-400 dark:border-blue-500" 
+          ? (nodeData.is_alive ? "border-blue-400 dark:border-blue-500" : "border-blue-300/40 dark:border-blue-900/40")
           : nodeData.gender === "女" 
-            ? "border-pink-400 dark:border-pink-500" 
+            ? (nodeData.is_alive ? "border-pink-400 dark:border-pink-500" : "border-pink-300/40 dark:border-pink-900/40")
             : "border-border",
         // 折叠时的强化样式
         nodeData.collapsed && "border-primary shadow-lg",
         // 高亮样式
         nodeData.isHighlighted && "ring-4 ring-yellow-400 dark:ring-yellow-500 scale-110 z-10",
         // 已故样式
-        !nodeData.is_alive && "opacity-70",
+        !nodeData.is_alive && "opacity-80 grayscale-[0.2]",
         // 折叠时的堆叠效果（视觉暗示下方有内容）
         nodeData.collapsed && [
           "before:absolute before:inset-0 before:translate-x-1 before:translate-y-1 before:border-2 before:border-muted-foreground/20 before:rounded-lg before:-z-10",
@@ -61,16 +63,21 @@ function FamilyMemberNodeComponent({ data }: FamilyNodeProps) {
       
       {/* 节点内容 */}
       <div className="flex flex-col items-center gap-1.5 mb-1">
-        <div className="font-semibold text-base text-center">{nodeData.name}</div>
+        <div className={cn(
+          "font-semibold text-base text-center",
+          !nodeData.is_alive && "text-foreground/80"
+        )}>
+          {nodeData.name}
+        </div>
         
         <div className="flex items-center gap-1.5 flex-wrap justify-center">
           {nodeData.generation !== null && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant={nodeData.is_alive ? "secondary" : "outline"} className={cn("text-xs", !nodeData.is_alive && "opacity-80")}>
               第{nodeData.generation}世
             </Badge>
           )}
           {nodeData.sibling_order !== null && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className={cn("text-xs", !nodeData.is_alive && "opacity-80")}>
               排行{nodeData.sibling_order}
             </Badge>
           )}
@@ -79,14 +86,16 @@ function FamilyMemberNodeComponent({ data }: FamilyNodeProps) {
         {nodeData.gender && (
           <span className={cn(
             "text-xs",
-            nodeData.gender === "男" ? "text-blue-600 dark:text-blue-400" : "text-pink-600 dark:text-pink-400"
+            nodeData.gender === "男" 
+              ? (nodeData.is_alive ? "text-blue-600 dark:text-blue-400" : "text-blue-800/60 dark:text-blue-300/50") 
+              : (nodeData.is_alive ? "text-pink-600 dark:text-pink-400" : "text-pink-800/60 dark:text-pink-300/50")
           )}>
             {nodeData.gender}
           </span>
         )}
         
         {!nodeData.is_alive && (
-          <span className="text-xs text-muted-foreground">已故</span>
+          <span className="text-xs text-muted-foreground/80 italic">已故</span>
         )}
       </div>
       
