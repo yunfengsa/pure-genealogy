@@ -14,6 +14,7 @@
     - `@xyflow/react` (React Flow) 用于 2D 族谱图
     - `react-force-graph-3d` 用于 3D 族谱图
     - `recharts` 用于统计仪表盘
+- **富文本**: `slate`, `slate-react`, `slate-history` 用于生平事迹编辑
 - **主题**: next-themes 支持明暗模式
 
 ## 关键架构模式
@@ -63,8 +64,11 @@ revalidatePath("/family-tree", "layout");
 
 ### 族谱管理 (`app/family-tree/`)
 - **成员列表**: 分页展示家族成员，支持搜索。已针对移动端优化，工具栏支持自动换行，表格支持横向滚动。
-- **添加/编辑**: 包含成员基本信息、父母关系（`father_id`）、配偶、生日（`birthday`）、居住地（`residence_place`）等。
-- **通用组件**: `MemberDetailDialog` 用于在 2D/3D 视图中统一展示成员详情。
+- **添加/编辑**: 
+    - 包含成员基本信息、父母关系（`father_id`）、配偶、生日（`birthday`）、居住地（`residence_place`）等。
+    - **生平事迹**: 使用富文本编辑器（Slate.js）替代原备注字段，支持加粗、斜体、下划线，最大 500 字。
+    - **弹窗优化**: 采用固定头部/底部 + 滚动内容区域的设计，防止内容过长溢出；点击遮罩不关闭以防数据丢失。
+- **通用组件**: `MemberDetailDialog` 用于在 2D/3D 视图中统一展示成员详情，生平事迹支持富文本渲染。
 
 ### 族谱可视化 (`app/family-tree/graph/`)
 - 基于 `@xyflow/react` 实现。
@@ -109,6 +113,7 @@ official_position, is_alive, spouse, remarks, birthday, death_date, residence_pl
 ```
 - `father_id` 自引用实现树形结构
 - `gender` 限制为 '男' 或 '女'
+- `remarks` 存储生平事迹 (Slate JSON string)
 - `birthday` 类型为 `date`
 - `residence_place` 类型为 `text`
 
@@ -127,6 +132,7 @@ npm run build  # 生产构建
 @/lib         → lib/
 @/hooks       → hooks/
 @/components/ui → shadcn 组件
+@/components/rich-text → 富文本编辑器组件
 ```
 
 ### UI 组件使用
