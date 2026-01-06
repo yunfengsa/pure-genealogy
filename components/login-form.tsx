@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -90,6 +91,7 @@ export function LoginForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLoading ? "登录中..." : "登录"}
               </Button>
             </div>
