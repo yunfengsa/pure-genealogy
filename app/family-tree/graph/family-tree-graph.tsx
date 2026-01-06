@@ -232,12 +232,17 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   // 当 initialNodes 变化（例如折叠状态改变），同步更新 nodes
   useEffect(() => {
     setNodes(initialNodes);
   }, [initialNodes, setNodes]);
+
+  // 当 initialEdges 变化，同步更新 edges
+  useEffect(() => {
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
 
   // 当高亮ID变化时更新节点
   useEffect(() => {
