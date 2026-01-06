@@ -22,6 +22,7 @@ interface FatherComboboxProps {
   onChange: (value: string) => void;
   options: ParentOption[];
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export function FatherCombobox({
@@ -29,6 +30,7 @@ export function FatherCombobox({
   onChange,
   options,
   disabled,
+  isLoading,
 }: FatherComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -54,9 +56,11 @@ export function FatherCombobox({
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between font-normal"
-          disabled={disabled}
+          disabled={disabled || isLoading}
         >
-          {selectedOption ? (
+          {isLoading ? (
+            <span className="text-muted-foreground">加载中...</span>
+          ) : selectedOption ? (
             <span>
               {selectedOption.name}
               {selectedOption.generation !== null && (

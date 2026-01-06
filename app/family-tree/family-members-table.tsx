@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import type { FamilyMember } from "./actions";
 import {
   createFamilyMember,
@@ -42,6 +42,7 @@ import { ImportMembersDialog } from "./import-members-dialog";
 import { FatherCombobox } from "./father-combobox";
 import { RichTextEditor } from "@/components/rich-text/editor";
 import { RichTextViewer } from "@/components/rich-text/viewer";
+import { cn } from "@/lib/utils";
 
 interface FamilyMembersTableProps {
   initialData: FamilyMember[];
@@ -60,12 +61,16 @@ export function FamilyMembersTable({
 }: FamilyMembersTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = React.useTransition();
 
   const [selectedIds, setSelectedIds] = React.useState<Set<number>>(new Set());
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState(searchQuery);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isLoadingParents, setIsLoadingParents] = React.useState(false);
+  const [loadingFatherId, setLoadingFatherId] = React.useState<number | null>(null);
+
   const [editingMember, setEditingMember] = React.useState<FamilyMember | null>(null);
   const [biographyMember, setBiographyMember] = React.useState<FamilyMember | null>(null);
   const [parentOptions, setParentOptions] = React.useState<
@@ -96,20 +101,25 @@ export function FamilyMembersTable({
   // 加载父亲选择列表
   React.useEffect(() => {
     if (isDialogOpen) {
-      fetchAllMembersForSelect().then(setParentOptions);
+      setIsLoadingParents(true);
+      fetchAllMembersForSelect()
+        .then(setParentOptions)
+        .finally(() => setIsLoadingParents(false));
     }
   }, [isDialogOpen]);
 
   const updateUrlParams = (params: Record<string, string>) => {
-    const newParams = new URLSearchParams(searchParams.toString());
-    Object.entries(params).forEach(([key, value]) => {
-      if (value) {
-        newParams.set(key, value);
-      } else {
-        newParams.delete(key);
-      }
+    startTransition(() => {
+      const newParams = new URLSearchParams(searchParams.toString());
+      Object.entries(params).forEach(([key, value]) => {
+        if (value) {
+          newParams.set(key, value);
+        } else {
+          newParams.delete(key);
+        }
+      });
+      router.push(`/family-tree?${newParams.toString()}`);
     });
-    router.push(`/family-tree?${newParams.toString()}`);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -267,8 +277,8 @@ export function FamilyMembersTable({
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-full sm:w-64"
           />
-          <Button type="submit" variant="outline" size="icon">
-            <Search className="h-4 w-4" />
+          <Button type="submit" variant="outline" size="icon" disabled={isPending}>
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
           </Button>
         </form>
 
@@ -286,7 +296,7 @@ export function FamilyMembersTable({
             onClick={handleDelete}
             disabled={selectedIds.size === 0 || isDeleting}
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
             删除 {selectedIds.size > 0 && `(${selectedIds.size})`}
           </Button>
         </div>
@@ -333,6 +343,7 @@ export function FamilyMembersTable({
                     <FatherCombobox
                       value={formData.father_id}
                       options={parentOptions}
+                      isLoading={isLoadingParents}
                       onChange={(value) => {
                         const father = parentOptions.find(p => p.id.toString() === value);
                         const newGeneration = father && father.generation !== null 
@@ -536,6 +547,7 @@ export function FamilyMembersTable({
                 取消
               </Button>
               <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSubmitting ? "保存中..." : "保存"}
               </Button>
             </DialogFooter>
@@ -544,7 +556,7 @@ export function FamilyMembersTable({
       </Dialog>
 
       {/* 表格 */}
-      <div className="border rounded-lg">
+      <div className={cn("border rounded-lg transition-opacity duration-200", isPending && "opacity-60 pointer-events-none")}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -607,18 +619,33 @@ export function FamilyMembersTable({
                   <TableCell>{member.sibling_order ?? "-"}</TableCell>
                   <TableCell>
                     {member.father_id && member.father_name ? (
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const fatherData = await fetchMemberById(member.father_id as number);
-                          if (fatherData) {
-                            handleOpenEditDialog(fatherData);
-                          }
-                        }}
-                        className="text-primary hover:underline cursor-pointer text-left"
-                      >
-                        {member.father_name}
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={loadingFatherId === member.father_id}
+                          onClick={async () => {
+                            if (!member.father_id) return;
+                            setLoadingFatherId(member.father_id);
+                            try {
+                              const fatherData = await fetchMemberById(member.father_id);
+                              if (fatherData) {
+                                handleOpenEditDialog(fatherData);
+                              }
+                            } finally {
+                              setLoadingFatherId(null);
+                            }
+                          }}
+                          className={cn(
+                            "text-primary hover:underline cursor-pointer text-left",
+                            loadingFatherId === member.father_id && "opacity-70 cursor-wait"
+                          )}
+                        >
+                          {member.father_name}
+                        </button>
+                        {loadingFatherId === member.father_id && (
+                          <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                        )}
+                      </div>
                     ) : (
                       "-"
                     )}
@@ -678,7 +705,7 @@ export function FamilyMembersTable({
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage <= 1}
+            disabled={currentPage <= 1 || isPending}
           >
             <ChevronLeft className="h-4 w-4" />
             上一页
@@ -687,7 +714,7 @@ export function FamilyMembersTable({
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage >= totalPages}
+            disabled={currentPage >= totalPages || isPending}
           >
             下一页
             <ChevronRight className="h-4 w-4" />
