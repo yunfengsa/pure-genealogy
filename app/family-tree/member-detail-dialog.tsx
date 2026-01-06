@@ -10,6 +10,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { User } from "lucide-react";
 import type { FamilyMemberNode } from "./graph/actions";
+import { RichTextViewer } from "@/components/rich-text/viewer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface MemberDetailDialogProps {
   isOpen: boolean;
@@ -34,7 +36,7 @@ export function MemberDetailDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -106,10 +108,10 @@ export function MemberDetailDialog({
 
           {member.remarks && (
             <div className="col-span-2 space-y-1">
-              <span className="text-muted-foreground">备注</span>
-              <p className="font-medium whitespace-pre-wrap">
-                {member.remarks}
-              </p>
+              <span className="text-muted-foreground">生平事迹</span>
+              <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+                <RichTextViewer value={member.remarks} />
+              </ScrollArea>
             </div>
           )}
         </div>

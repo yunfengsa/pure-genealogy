@@ -64,7 +64,7 @@ export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
         官职: "进士",
         是否在世: "是",
         配偶: "王氏",
-        备注: "字某某",
+        生平事迹: "字某某",
         生日: "1990-01-01",
         居住地: "某地",
       },
@@ -107,7 +107,7 @@ export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
             official_position: row["官职"] ? String(row["官职"]) : null,
             is_alive: row["是否在世"] === "否" ? false : true, 
             spouse: row["配偶"] ? String(row["配偶"]) : null,
-            remarks: row["备注"] ? String(row["备注"]) : null,
+            remarks: row["生平事迹"] ? String(row["生平事迹"]) : (row["备注"] ? String(row["备注"]) : null),
             birthday: row["生日"] ? String(row["生日"]) : null,
             residence_place: row["居住地"] ? String(row["居住地"]) : null,
           };
