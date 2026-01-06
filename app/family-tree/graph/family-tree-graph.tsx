@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState, useRef, useEffect, type MouseEvent } from "react";
+import { createClient } from "@/lib/supabase/client";
 import {
   ReactFlow,
   Controls,
@@ -180,6 +181,18 @@ function getLayoutedElements(
 function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
   const reactFlowInstance = useReactFlow();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setUserEmail(user.email);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
@@ -280,11 +293,6 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
     );
 
     if (found) {
-      // 如果找到的节点被折叠了（它的祖先被折叠），需要展开
-      // 简单处理：如果搜索，我们可以清除折叠，或者找到路径并展开
-      // 这里暂时只做定位，如果不可见，用户可能看不到
-      // 改进：找到节点后，检查其祖先是否在 collapsedIds 中，如果有，移除
-      
       let current = found;
       const idsToExpand = new Set<number>();
       while(current.father_id) {
@@ -302,11 +310,8 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
               idsToExpand.forEach(id => next.delete(id));
               return next;
           });
-          // 稍微延迟一下等待重新布局
           setTimeout(() => {
             setHighlightedId(found.id);
-            // 这里无法直接获取新节点位置，因为 setNodes 是异步的
-            // 可以依赖 useEffect [highlightedId] 触发后的逻辑，或者再加个 effect 监听 search 目标
           }, 100);
       } else {
         setHighlightedId(found.id);
@@ -319,7 +324,6 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
   // 监听 highlight 变化后聚焦
   useEffect(() => {
       if (highlightedId) {
-          // 稍微延迟等待布局更新
           setTimeout(() => {
             const node = reactFlowInstance.getNode(String(highlightedId));
             if (node) {
@@ -330,7 +334,7 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
             }
           }, 200);
       }
-  }, [highlightedId, reactFlowInstance, nodes]); // nodes 变化时也尝试聚焦
+  }, [highlightedId, reactFlowInstance, nodes]);
 
   // 清除搜索
   const onClearSearch = useCallback(() => {
@@ -389,7 +393,7 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
     [initialData]
   );
 
-  const onDownload = useCallback(() => {
+  const onDownload = useCallback(async () => {
     // 获取视口元素
     const viewportElem = document.querySelector(
       ".react-flow__viewport"
@@ -414,28 +418,111 @@ function FamilyTreeGraphInner({ initialData }: FamilyTreeGraphProps) {
       0.15 // padding (增加留白)
     );
 
-    toPng(viewportElem, {
-      // 兜底背景色 (Mint 50)
-      backgroundColor: "#f0fdf4",
+    // 1. 预加载背景图片 (Base64)
+    let bgDataUrl = "";
+    try {
+      const response = await fetch("/images/login-bg.jpg");
+      if (response.ok) {
+        const blob = await response.blob();
+        bgDataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch (error) {
+      console.warn("Failed to load background image:", error);
+    }
+
+    // 2. 准备 Canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = imageWidth * 2.0; // Match pixelRatio
+    canvas.height = imageHeight * 2.0;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.scale(2.0, 2.0);
+
+    // 3. 绘制背景
+    if (bgDataUrl) {
+      const bgImg = new Image();
+      bgImg.src = bgDataUrl;
+      await new Promise((resolve) => {
+        bgImg.onload = resolve;
+      });
+
+      // Cover 模式
+      const bgRatio = bgImg.width / bgImg.height;
+      const canvasRatio = imageWidth / imageHeight;
+      let drawW = imageWidth;
+      let drawH = imageHeight;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (bgRatio > canvasRatio) {
+        drawH = imageHeight;
+        drawW = imageHeight * bgRatio;
+        offsetX = (imageWidth - drawW) / 2;
+      } else {
+        drawW = imageWidth;
+        drawH = imageWidth / bgRatio;
+        offsetY = (imageHeight - drawH) / 2;
+      }
+      
+      ctx.drawImage(bgImg, offsetX, offsetY, drawW, drawH);
+    } else {
+       ctx.fillStyle = "#f9f5f0";
+       ctx.fillRect(0, 0, imageWidth, imageHeight);
+    }
+
+    // 4. 绘制水印 (平铺)
+    const watermarkText = userEmail || 'Liu Family';
+    ctx.save();
+    ctx.rotate(-30 * Math.PI / 180);
+    ctx.font = "16px sans-serif";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.03)";
+    ctx.textAlign = "center";
+    
+    const stepX = 200;
+    const stepY = 100;
+    for (let x = -imageWidth; x < imageWidth * 2; x += stepX) {
+      for (let y = -imageHeight; y < imageHeight * 2; y += stepY) {
+         ctx.fillText(watermarkText, x, y);
+      }
+    }
+    ctx.restore();
+
+    // 5. 生成族谱树的透明 PNG 并绘制
+    const treeDataUrl = await toPng(viewportElem, {
       width: imageWidth,
       height: imageHeight,
+      backgroundColor: null as any,
       style: {
         width: imageWidth.toString(),
         height: imageHeight.toString(),
         transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`,
-        backgroundSize: "20px 20px, 100% 100%", // 点阵重复，渐变铺满
-        // 确保字体渲染清晰且一致
         fontFamily: 'system-ui, -apple-system, sans-serif',
+        backgroundColor: 'transparent', // Explicitly set style bg to transparent
       },
-      pixelRatio: 2.5, // 稍微提高像素比，保证更高清
-      cacheBust: true, // 避免缓存导致图片加载失败
-    }).then((dataUrl) => {
-      const a = document.createElement("a");
-      a.setAttribute("download", `family-tree-${new Date().toISOString().split('T')[0]}.png`);
-      a.setAttribute("href", dataUrl);
-      a.click();
+      pixelRatio: 2.0, // 降低到 2.0 兼顾清晰度与体积
+      cacheBust: true,
     });
-  }, [nodes]);
+
+    const treeImg = new Image();
+    treeImg.src = treeDataUrl;
+    await new Promise((resolve) => {
+      treeImg.onload = resolve;
+    });
+
+    ctx.drawImage(treeImg, 0, 0, imageWidth, imageHeight);
+
+    // 6. 导出为 JPEG 以大幅压缩体积
+    const finalDataUrl = canvas.toDataURL("image/jpeg", 0.85); // 使用 0.85 质量均衡体积与清晰度
+    const a = document.createElement("a");
+    a.setAttribute("download", `family-tree-${new Date().toISOString().split('T')[0]}.jpg`);
+    a.setAttribute("href", finalDataUrl);
+    a.click();
+  }, [nodes, userEmail]);
 
   const toggleDraggable = useCallback(() => {
     setIsDraggable((prev) => !prev);
