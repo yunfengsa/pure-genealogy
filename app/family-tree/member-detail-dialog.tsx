@@ -221,7 +221,7 @@ export function MemberDetailDialog({
                      <div className="flex-1 w-full overflow-y-auto min-h-0 rounded-md border border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 p-3 sm:p-4 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
                         {member.remarks ? (
                           <div className="prose prose-stone dark:prose-invert prose-sm max-w-none">
-                            <RichTextViewer value={member.remarks} />
+                            <RichTextViewer value={member.remarks} animate={isFlipped} />
                           </div>
                         ) : (
                           <div className="h-full flex flex-col items-center justify-center text-stone-400 dark:text-stone-600 italic">

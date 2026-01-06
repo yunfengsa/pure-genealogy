@@ -307,6 +307,7 @@ export function FamilyMembersTable({
         <DialogContent 
           className="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0 gap-0"
           onInteractOutside={(e) => e.preventDefault()}
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <DialogHeader className="px-6 py-4 border-b">
             <DialogTitle>{isEditMode ? "编辑成员" : "新增成员"}</DialogTitle>
