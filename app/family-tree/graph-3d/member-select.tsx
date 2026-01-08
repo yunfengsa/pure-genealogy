@@ -40,7 +40,7 @@ export function MemberSelect({
   const selectedMember = members.find((m) => m.id === value);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover modal={true} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -62,7 +62,7 @@ export function MemberSelect({
             className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0 focus-visible:ring-0 px-0"
           />
         </div>
-        <ScrollArea className="h-72">
+        <ScrollArea className="h-48 sm:h-72">
           <div className="p-1">
             {filteredMembers.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
