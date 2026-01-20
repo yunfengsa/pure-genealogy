@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Upload, Download, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { batchCreateFamilyMembers, type ImportMemberInput } from "./actions";
+import { FAMILY_SURNAME } from "@/lib/utils";
 
 interface ImportMembersDialogProps {
   onSuccess?: () => void;
@@ -56,10 +57,10 @@ export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
       {
-        姓名: "刘某某",
+        姓名: `${FAMILY_SURNAME}某某`,
         世代: 20,
         排行: 1,
-        父亲姓名: "刘父名",
+        父亲姓名: `${FAMILY_SURNAME}父名`,
         性别: "男",
         官职: "进士",
         是否在世: "是",

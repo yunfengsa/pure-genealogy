@@ -9,3 +9,5 @@ export function cn(...inputs: ClassValue[]) {
 export const hasEnvVars =
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+export const FAMILY_SURNAME = process.env.NEXT_PUBLIC_FAMILY_SURNAME || "刘";

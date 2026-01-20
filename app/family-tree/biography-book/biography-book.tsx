@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, FAMILY_SURNAME } from "@/lib/utils";
 import type { BiographyMember } from "./actions";
 import { RichTextViewer } from "@/components/rich-text/viewer";
 
@@ -695,7 +695,7 @@ function CoverPage({ totalPages }: { totalPages: number }) {
                     <BookOpen className="w-16 h-16 sm:w-24 sm:h-24 mx-auto text-amber-200/80" />
                 </div>
                 <h1 className="text-4xl sm:text-6xl font-serif font-bold text-amber-100 tracking-widest mb-6 drop-shadow-lg">
-                    刘氏生平
+                    {FAMILY_SURNAME}氏生平
                 </h1>
                 <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-amber-300/60 to-transparent mb-6" />
                 <p className="text-amber-200/70 text-lg sm:text-xl font-serif tracking-wide">

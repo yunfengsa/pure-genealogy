@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 import { fetchMembersWithBiography } from "./actions";
 import { BiographyBook } from "./biography-book";
+import { FAMILY_SURNAME } from "@/lib/utils";
 
 export const metadata = {
-    title: "刘氏生平册",
-    description: "刘氏家族生平事迹集",
+    title: `${FAMILY_SURNAME}氏生平册`,
+    description: `${FAMILY_SURNAME}氏家族生平事迹集`,
 };
 
 async function BookContent() {

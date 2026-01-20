@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/next";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
+import { FAMILY_SURNAME } from "@/lib/utils";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -11,7 +12,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "刘氏族谱管理系统",
+  title: `${FAMILY_SURNAME}氏族谱管理系统`,
   description: "基于 Next.js 和 Supabase 构建的家族族谱管理系统",
 };
 
