@@ -714,6 +714,15 @@ const FamilyTreeGraphInner = memo(function FamilyTreeGraphInner({ initialData, o
     setIsDraggable((prev) => !prev);
   }, []);
 
+  // 修复：路由切换回来时，强制重新适应视图
+  // onInit 中的 fitView 可能因为容器尺寸未就绪而失效
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      reactFlowInstance.fitView({ padding: 0.2, duration: 300 });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [reactFlowInstance]);
+
   return (
     <div
       ref={containerRef}
