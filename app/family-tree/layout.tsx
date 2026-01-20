@@ -17,7 +17,7 @@ export default function FamilyTreeLayout({
           <Link href="/" className="font-semibold text-lg hover:opacity-80 transition-opacity">
             刘氏族谱
           </Link>
-          
+
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link href="/family-tree" className="hover:text-primary transition-colors">
               成员列表
@@ -28,11 +28,14 @@ export default function FamilyTreeLayout({
             <Link href="/family-tree/graph-3d" className="hover:text-primary transition-colors">
               3D 族谱
             </Link>
-             <Link href="/family-tree/timeline" className="hover:text-primary transition-colors">
+            <Link href="/family-tree/timeline" className="hover:text-primary transition-colors">
               时间轴
             </Link>
             <Link href="/family-tree/statistics" className="hover:text-primary transition-colors">
               统计分析
+            </Link>
+            <Link href="/family-tree/biography-book" className="hover:text-primary transition-colors">
+              生平册
             </Link>
           </nav>
 

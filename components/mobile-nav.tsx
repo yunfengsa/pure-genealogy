@@ -46,9 +46,14 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
             统计分析
           </Link>
         </DropdownMenuItem>
-        
+        <DropdownMenuItem asChild>
+          <Link href="/family-tree/biography-book" className="w-full cursor-pointer">
+            生平册
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuSeparator />
-        
+
         <div className="p-2 overflow-x-auto">
           {children}
         </div>
