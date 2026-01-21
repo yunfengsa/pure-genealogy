@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef, memo } from "react";
 import {
     ChevronLeft,
     ChevronRight,
@@ -23,8 +23,8 @@ interface BiographyBookProps {
     members: BiographyMember[];
 }
 
-// 单独的页面组件
-function MemberPage({
+// 单独的页面组件（使用 memo 避免不必要的重渲染）
+const MemberPage = memo(function MemberPage({
     member,
     pageIndex,
     totalPages,
@@ -181,7 +181,7 @@ function MemberPage({
             </div>
         </div>
     );
-}
+});
 
 export function BiographyBook({ members }: BiographyBookProps) {
     // 页面状态: -1 = 封面, 0-n = 成员页
@@ -674,8 +674,8 @@ export function BiographyBook({ members }: BiographyBookProps) {
     );
 }
 
-// 封面组件
-function CoverPage({ totalPages }: { totalPages: number }) {
+// 封面组件（使用 memo 避免不必要的重渲染）
+const CoverPage = memo(function CoverPage({ totalPages }: { totalPages: number }) {
     return (
         <div className="w-full h-full bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 rounded-r-lg shadow-2xl flex flex-col items-center justify-center p-8 relative overflow-hidden">
             {/* 封面装饰纹理 */}
@@ -714,4 +714,4 @@ function CoverPage({ totalPages }: { totalPages: number }) {
             </div>
         </div>
     );
-}
+});

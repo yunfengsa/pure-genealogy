@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { fetchMembersWithBiography } from "./actions";
-import { BiographyBook } from "./biography-book";
+import { BiographyBookLoader } from "./biography-book-loader";
 import { FAMILY_SURNAME } from "@/lib/utils";
 
 export const metadata = {
@@ -33,7 +33,7 @@ async function BookContent() {
         );
     }
 
-    return <BiographyBook members={members} />;
+    return <BiographyBookLoader members={members} />;
 }
 
 export default function BiographyBookPage() {
