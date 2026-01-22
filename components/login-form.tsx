@@ -21,8 +21,10 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const prefillEmail = process.env.NEXT_PUBLIC_LOGIN_EMAIL ?? "";
+  const prefillPassword = process.env.NEXT_PUBLIC_LOGIN_PASSWORD ?? "";
+  const [email, setEmail] = useState(prefillEmail);
+  const [password, setPassword] = useState(prefillPassword);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
