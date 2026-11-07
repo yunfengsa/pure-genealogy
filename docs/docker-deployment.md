@@ -149,6 +149,16 @@ docker compose --env-file .env.self-hosted -f compose.self-hosted.yml restart ga
 
 网关对 `/auth/v1/verify`、`/auth/v1/callback`、`/auth/v1/authorize` 保留官方公开跳转语义，浏览器无需 apikey 头；其他 Auth 与 REST 路由必须有正确 apikey，用户 Authorization token 原样传递，缺省使用 anon token。service_role 仍由 Auth / PostgREST 验证，不能把它当浏览器 key 使用。
 
+## 同源部署（单域名）
+
+默认形态把 API 网关挂在独立域名上（浏览器跨域请求 `/auth/v1`、`/rest/v1`）。个人自托管通常只有一个域名，此时可让 API 与页面同源：
+
+1. 应用侧留空 `NEXT_PUBLIC_SUPABASE_URL`，服务端保留 `SUPABASE_INTERNAL_URL=http://gateway:8000`；容器启动校验会要求内部地址存在。
+2. 反向代理把站点域名下的 `/auth/v1`、`/rest/v1` 转发到 `gateway:8000`，其余路径转发到应用 `3000`。
+3. Auth 的 `API_EXTERNAL_URL` 填站点地址（本仓库 Compose 已按此回落到 `SITE_URL`）。
+
+同源后浏览器只请求当前域名：没有跨域预检，也不需要维护 CORS 白名单；会话 cookie 名固定为 `sb-auth-token`，与访问域名无关。反向代理若改写 Host 头也不影响 API 地址，因为地址由浏览器按 `window.location.origin` 决定。
+
 ## 数据持久化、备份与恢复
 
 Compose 项目名默认 `pure-genealogy`，数据库使用 `db-data` 命名卷与卷内 `pgdata` 目录。`docker compose down` 保留数据卷；`down -v` 会删除族谱与全部账号。请保持项目名及原配置文件不变。备份数据库与 `.env.self-hosted`，二者都含敏感信息。

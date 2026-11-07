@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getServerSupabaseConfig, getSupabaseCookieName } from "@/lib/runtime-config";
+import { getConfiguredCookieName, getServerSupabaseConfig } from "@/lib/runtime-config";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -17,7 +17,7 @@ export async function updateSession(request: NextRequest) {
     config.internalUrl ?? config.supabaseUrl,
     config.supabasePublishableKey,
     {
-      cookieOptions: { name: getSupabaseCookieName(config.supabaseUrl) },
+      cookieOptions: { name: getConfiguredCookieName(config) },
       cookies: {
         getAll() {
           return request.cookies.getAll();
