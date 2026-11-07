@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getServerSupabaseConfig, getSupabaseCookieName } from "@/lib/runtime-config";
+import { getConfiguredCookieName, getServerSupabaseConfig } from "@/lib/runtime-config";
 
 /**
  * Especially important if using Fluid compute: Don't put this client in a
@@ -15,7 +15,7 @@ export async function createClient() {
     config.internalUrl ?? config.supabaseUrl,
     config.supabasePublishableKey,
     {
-      cookieOptions: { name: getSupabaseCookieName(config.supabaseUrl) },
+      cookieOptions: { name: getConfiguredCookieName(config) },
       cookies: {
         getAll() {
           return cookieStore.getAll();

@@ -7,7 +7,8 @@ services:
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: 0.0.0.0
-      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:?请先生成 .env.self-hosted}
+      # 留空即同源部署：浏览器直接请求当前域名下的 /auth/v1 与 /rest/v1。
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:?请先生成 .env.self-hosted}
       NEXT_PUBLIC_FAMILY_SURNAME: ${NEXT_PUBLIC_FAMILY_SURNAME:-刘}
       SUPABASE_INTERNAL_URL: ${SUPABASE_INTERNAL_URL:-http://gateway:8000}
@@ -49,7 +50,8 @@ services:
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: "9999"
-      API_EXTERNAL_URL: ${NEXT_PUBLIC_SUPABASE_URL:?请先生成 .env.self-hosted}
+      # 同源部署时公开 API 地址就是站点地址。
+      API_EXTERNAL_URL: ${NEXT_PUBLIC_SUPABASE_URL:-${SITE_URL}}
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${AUTH_DB_PASSWORD}@db:5432/postgres
       GOTRUE_SITE_URL: ${SITE_URL:?请配置应用的公开地址}

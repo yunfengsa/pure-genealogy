@@ -13,7 +13,7 @@ const jwt = (role) => `eyJhbGciOiJIUzI1NiJ9.${Buffer.from(JSON.stringify({ role 
 test("公开配置按调用读取运行时环境，切换 A/B 不保留模块加载值", () => {
   assert.equal(runtime.getPublicRuntimeConfig(env).familySurname, "张");
   assert.deepEqual(runtime.getPublicRuntimeConfig({ ...env, NEXT_PUBLIC_SUPABASE_URL: "https://b.example", NEXT_PUBLIC_FAMILY_SURNAME: "李" }), {
-    supabaseUrl: "https://b.example", supabasePublishableKey: "sb_publishable_test", familySurname: "李",
+    supabaseUrl: "https://b.example", sameOrigin: false, supabasePublishableKey: "sb_publishable_test", familySurname: "李",
   });
   const previous = { ...process.env };
   try {
@@ -31,14 +31,14 @@ test("公开配置按调用读取运行时环境，切换 A/B 不保留模块加
 
 test("公开对象和安全 JSON 不含内部 URL、secret，script 结束符不能逃逸", () => {
   const config = runtime.getPublicRuntimeConfig({ ...env, NEXT_PUBLIC_FAMILY_SURNAME: '</script><script>globalThis.pwned=true</script>\u2028', SUPABASE_INTERNAL_URL: "http://gateway:8000", SUPABASE_SERVICE_ROLE_KEY: "private-secret" });
-  assert.deepEqual(Object.keys(config).sort(), ["familySurname", "supabasePublishableKey", "supabaseUrl"]);
+  assert.deepEqual(Object.keys(config).sort(), ["familySurname", "sameOrigin", "supabasePublishableKey", "supabaseUrl"]);
   const json = runtime.serializePublicRuntimeConfig(config);
   assert.doesNotMatch(json, /<|>|gateway|private-secret|\u2028/);
   assert.deepEqual(JSON.parse(json), config);
 });
 
 test("缺少配置、非 HTTP(S)、带凭据的 URL 与私密 key 被拒绝", () => {
-  for (const replacement of ["", "postgres://db:5432/postgres", "javascript:alert(1)", "https://user:pass@example.com"]) {
+  for (const replacement of ["postgres://db:5432/postgres", "javascript:alert(1)", "https://user:pass@example.com"]) {
     assert.throws(() => runtime.getPublicRuntimeConfig({ ...env, NEXT_PUBLIC_SUPABASE_URL: replacement }), /NEXT_PUBLIC_SUPABASE_URL/);
   }
   for (const key of ["", "sb_secret_private", jwt("service_role"), "not-a-public-key", jwt("authenticated")]) {
@@ -70,6 +70,34 @@ test("SSR 内部地址与浏览器公共地址共享原有 cookie 身份", async
   assert.equal(serverArgs[0], "http://gateway:8000");
   assert.equal(browserArgs[0], "https://public.example");
   assert.equal(serverArgs[2].cookieOptions.name, browserArgs[2].cookieOptions.name);
+});
+
+test("不配置公开地址时按同源部署，浏览器使用当前 origin", async () => {
+  const sameOriginEnv = { ...env };
+  delete sameOriginEnv.NEXT_PUBLIC_SUPABASE_URL;
+  const config = runtime.getPublicRuntimeConfig(sameOriginEnv);
+  assert.equal(config.sameOrigin, true);
+  assert.equal(config.supabaseUrl, "");
+  assert.equal(runtime.getConfiguredCookieName(config), "sb-auth-token");
+  assert.throws(() => runtime.getServerSupabaseConfig(sameOriginEnv), /SUPABASE_INTERNAL_URL/);
+  const serverConfig = runtime.getServerSupabaseConfig({ ...sameOriginEnv, SUPABASE_INTERNAL_URL: "http://gateway:8000" });
+
+  let browserArgs;
+  const browser = loadTypeScript("lib/supabase/client.ts", {
+    "@/lib/runtime-config": runtime,
+    "@/components/runtime-config-provider": { getBrowserPublicRuntimeConfig: () => serverConfig },
+    "@supabase/ssr": { createBrowserClient: (...args) => { browserArgs = args; return {}; } },
+  });
+  const previousWindow = globalThis.window;
+  try {
+    globalThis.window = { location: { origin: "https://genealogy.example" } };
+    browser.createClient();
+  } finally {
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+  }
+  assert.equal(browserArgs[0], "https://genealogy.example");
+  assert.equal(browserArgs[2].cookieOptions.name, "sb-auth-token");
 });
 
 test("浏览器同步接口读取 DOM 配置，Context 保留服务端传入配置", () => {
