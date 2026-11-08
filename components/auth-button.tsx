@@ -20,6 +20,9 @@ export async function AuthButton() {
         <Button asChild size="sm" variant={"outline"} className="w-full md:w-auto">
           <Link href="/family-tree">数据维护</Link>
         </Button>
+        <Button asChild size="sm" variant={"outline"} className="w-full md:w-auto">
+          <Link href="/family-tree/settings">设置</Link>
+        </Button>
         <LogoutButton className="w-full md:w-auto" />
       </div>
     </div>

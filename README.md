@@ -94,6 +94,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=你的_Supabase_Anon_Key
 
 在 Supabase 项目的 SQL Editor 中执行 [数据库初始化 SQL](docker/self-hosted/family-members.sql)，创建成员表、索引与 RLS。该脚本用于新安装，仅执行一次；匿名用户无权访问族谱，所有已登录用户可读写。已有数据库先备份并核对结构。
 
+再执行 [站点设置 SQL](docker/self-hosted/site-settings.sql) 创建 `site_settings` 表，用于保存家族姓氏。姓氏默认取环境变量 `NEXT_PUBLIC_FAMILY_SURNAME`（缺省为「刘」）；已登录用户可在「设置」页修改，保存后全站即时生效，无需重启。自托管部署的 `00-init.sh` 会自动执行这两个脚本。
+
 在 Supabase Authentication 中创建并确认首位用户；详细权限与自托管账号创建方式见 [Docker 部署文档](docs/docker-deployment.md)。
 
 ### 5. 启动开发服务器

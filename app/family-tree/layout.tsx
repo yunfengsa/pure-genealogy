@@ -3,14 +3,14 @@ import Link from "next/link";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { MobileNav } from "@/components/mobile-nav";
-import { getPublicRuntimeConfig } from "@/lib/runtime-config";
+import { getFamilySurname } from "@/lib/clan-settings";
 
-export default function FamilyTreeLayout({
+export default async function FamilyTreeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { familySurname } = getPublicRuntimeConfig();
+  const familySurname = await getFamilySurname();
   return (
     <div className="min-h-screen flex flex-col">
       {/* 顶部导航栏 */}

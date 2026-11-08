@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import { fetchMembersWithBiography } from "./actions";
 import { BiographyBookLoader } from "./biography-book-loader";
-import { getPublicRuntimeConfig } from "@/lib/runtime-config";
+import { getFamilySurname } from "@/lib/clan-settings";
 
-export function generateMetadata() {
-    const { familySurname } = getPublicRuntimeConfig();
+export async function generateMetadata() {
+    const familySurname = await getFamilySurname();
     return {
         title: `${familySurname}氏生平册`,
         description: `${familySurname}氏家族生平事迹集`,
