@@ -25,14 +25,12 @@ import { Upload, Download, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { batchCreateFamilyMembers, previewFamilyMembersImport } from "./actions";
 import { parseImportRows, type ImportFatherMatch, type ImportMemberInput } from "./member-import";
-import { useRuntimeConfig } from "@/components/runtime-config-provider";
 
 interface ImportMembersDialogProps {
   onSuccess?: () => void;
 }
 
 export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
-  const { familySurname } = useRuntimeConfig();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [parsedData, setParsedData] = React.useState<ImportMemberInput[]>([]);
@@ -59,39 +57,15 @@ export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
     }
   };
 
-  // 下载模板
+  // 下载模板：交给服务端 /api/template 生成并返回附件，浏览器直接下载，
+  // 彻底绕开客户端 XLSX.writeFile / Blob 在部分浏览器下"卡死下载"的兼容性问题。
   const handleDownloadTemplate = () => {
-    const ws = XLSX.utils.json_to_sheet([
-      {
-        姓名: `${familySurname}父名`,
-        世代: 19,
-        排行: 1,
-        父亲姓名: "",
-        性别: "男",
-        官职: "",
-        是否在世: "是",
-        配偶: "",
-        生平事迹: "",
-        生日: "1965-01-01",
-        居住地: "某地",
-      },
-      {
-        姓名: `${familySurname}某某`,
-        世代: 20,
-        排行: 1,
-        父亲姓名: `${familySurname}父名`,
-        性别: "男",
-        官职: "进士",
-        是否在世: "是",
-        配偶: "王氏",
-        生平事迹: "字某某",
-        生日: "1990-01-01",
-        居住地: "某地",
-      },
-    ]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "成员导入模板");
-    XLSX.writeFile(wb, "族谱成员导入模板.xlsx");
+    const a = document.createElement("a");
+    a.href = "/api/template";
+    a.download = "族谱成员导入模板.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   // 处理文件上传
