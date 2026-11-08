@@ -1,9 +1,9 @@
 import { NextLogo } from "./next-logo";
 import { SupabaseLogo } from "./supabase-logo";
-import { getPublicRuntimeConfig } from "@/lib/runtime-config";
+import { getFamilySurname } from "@/lib/clan-settings";
 
-export function Hero() {
-  const { familySurname } = getPublicRuntimeConfig();
+export async function Hero() {
+  const familySurname = await getFamilySurname();
   return (
     <div className="flex flex-col gap-8 lg:gap-16 items-center px-4">
       <div className="flex gap-8 justify-center items-center">

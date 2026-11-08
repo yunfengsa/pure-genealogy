@@ -5,12 +5,13 @@ import { Analytics } from "@vercel/analytics/next";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { getPublicRuntimeConfig, serializePublicRuntimeConfig } from "@/lib/runtime-config";
+import { getFamilySurname } from "@/lib/clan-settings";
 import { RuntimeConfigProvider } from "@/components/runtime-config-provider";
 
 export const dynamic = "force-dynamic";
 
-export function generateMetadata(): Metadata {
-  const { familySurname } = getPublicRuntimeConfig();
+export async function generateMetadata(): Promise<Metadata> {
+  const familySurname = await getFamilySurname();
   const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
@@ -34,12 +35,13 @@ const notoSerifSC = Noto_Serif_SC({
   display: "swap",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const config = getPublicRuntimeConfig();
+  config.familySurname = await getFamilySurname();
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
