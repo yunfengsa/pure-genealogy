@@ -24,7 +24,7 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
     "@types/dagre": "^0.7.53",
-    "@types/three": "0.182.0",
+    "@types/three": "0.180.0",
     "@vercel/analytics": "^1.6.1",
     "@xyflow/react": "^12.10.0",
     "class-variance-authority": "^0.7.1",
@@ -43,7 +43,7 @@
     "slate-history": "^0.113.1",
     "slate-react": "^0.120.0",
     "tailwind-merge": "^3.3.0",
-    "three": "0.182.0",
+    "three": "0.180.0",
     "three-spritetext": "^1.10.0",
     "xlsx": "^0.18.5"
   },
